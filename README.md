@@ -1,6 +1,6 @@
 # EmailSender
 Send email in a autonomous way
-![Screenshot](1.png)
+![Screenshot](1.PNG)
 # Splinterlands Custom Team Bot👋 
 ![Screenshot](2.png)
 
