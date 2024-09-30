@@ -1,16 +1,24 @@
 # EmailSender
 Send email in a autonomous way
 ![Screenshot](1.PNG)
-# Splinterlands Custom Team Bot👋 
-![Screenshot](2.png)
+# Email Sender Bot👋 
 
 ## Installation 
 
-#### Google cloud https://console.cloud.google.com/
+#### Enable 2 step verification
 ```bash
-git clone https://github.com/edmark21/Splinters.git
+login to google
+
+go to Manage you account to google
+
+go to security and enable it
 ```
 
+#### Create Google App Password
 ```bash
-cd Splinters
+App Password url: https://myaccount.google.com/apppasswords
 ```
+
+#### Once done login you email google app password in the app
+
+
