@@ -21,4 +21,9 @@ App Password url: https://myaccount.google.com/apppasswords
 
 #### Once done login you email google app password in the app
 
+#### How To run the script?
+```bash
+python es.py
+```
+
 
