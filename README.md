@@ -27,3 +27,24 @@ python es.py
 ```
 
 
+## Gspread Setup
+
+#### step 1
+```bash
+go to this url: https://console.cloud.google.com/
+```
+
+#### step 2
+```bash
+click the search bar and search for Google Sheets API and click enable
+```
+
+#### step 3
+```bash
+click the search bar and search for Google Sheets API
+```
+
+#### step 4 once done enabling the api
+```bash
+click manage and create your credentials..
+```
