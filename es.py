@@ -1,27 +1,124 @@
-import getpass, os, sys
+import getpass, os, sys, re, json
 import smtplib
+
+import gspread
+
+from oauth2client.service_account import ServiceAccountCredentials
 from email.mime.text import MIMEText
-
-e = '1'
-
-banner1 ='''
-
-
-███████╗███╗   ███╗ █████╗ ██╗██╗         ███████╗███████╗███╗   ██╗██████╗ ███████╗██████╗ 
-██╔════╝████╗ ████║██╔══██╗██║██║         ██╔════╝██╔════╝████╗  ██║██╔══██╗██╔════╝██╔══██╗
-█████╗  ██╔████╔██║███████║██║██║         ███████╗█████╗  ██╔██╗ ██║██║  ██║█████╗  ██████╔╝
-██╔══╝  ██║╚██╔╝██║██╔══██║██║██║         ╚════██║██╔══╝  ██║╚██╗██║██║  ██║██╔══╝  ██╔══██╗
-███████╗██║ ╚═╝ ██║██║  ██║██║███████╗    ███████║███████╗██║ ╚████║██████╔╝███████╗██║  ██║
-╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝╚══════╝    ╚══════╝╚══════╝╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝
-                                                                                            
-                Email Loaded [''' + e + ''']
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
 
 
-            [1] Start
-            [2] Option
-            [3] About
-            
-'''
+def wala():
+  try:
+    os.system("cls")
+
+  except:
+    os.system("clear")
+    
+wala()
+
+
+
+
+filename = 'credentials.txt'
+fina = input(" [1] Enter the filename of the file, ex: file.pdf or file.txt: ")
+fina2 = input(" [2] Enter the filename of the file, ex: file.pdf or file.txt: ")
+fina3 = input(" [3] Enter the filename of the signature file, ex: signature.png: ")
+
+
+
+
+
+
+def count_emails(file_path):
+  """Counts the total number of emails in a JSON file.
+
+  Args:
+    file_path: The path to the JSON file.
+
+  Returns:
+    The total number of emails.
+  """
+
+  with open(file_path, 'r') as f:
+    data = json.load(f)
+
+  email_count = 0
+  for entry in data:
+    if 'Email' in entry:
+      email_count += 1
+
+  return email_count
+
+# Replace 'extracted_data.json' with the actual path to your JSON file
+file_path = 'extracted_data.json'
+total_emails = count_emails(file_path) #total email
+
+
+
+
+
+
+try:
+    with open(filename, 'r') as file:
+        for line in file:
+            # Check for email format (basic validation)
+            if '@' in line and '.' in line.split('@')[-1]:
+                email = line.strip().split(':')[0]  # Extract email address only
+                break  # Exit the loop after finding the first valid email
+except FileNotFoundError:
+    print(f"[Please Login first in Option menu]")
+
+try:
+    
+
+
+    banner1 ='''
+
+
+    ███████╗███╗   ███╗ █████╗ ██╗██╗         ███████╗███████╗███╗   ██╗██████╗ ███████╗██████╗ 
+    ██╔════╝████╗ ████║██╔══██╗██║██║         ██╔════╝██╔════╝████╗  ██║██╔══██╗██╔════╝██╔══██╗
+    █████╗  ██╔████╔██║███████║██║██║         ███████╗█████╗  ██╔██╗ ██║██║  ██║█████╗  ██████╔╝
+    ██╔══╝  ██║╚██╔╝██║██╔══██║██║██║         ╚════██║██╔══╝  ██║╚██╗██║██║  ██║██╔══╝  ██╔══██╗
+    ███████╗██║ ╚═╝ ██║██║  ██║██║███████╗    ███████║███████╗██║ ╚████║██████╔╝███████╗██║  ██║
+    ╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝╚══════╝    ╚══════╝╚══════╝╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝
+
+
+                    Login as: [''' + email + ''']                                                                            
+                    Email Loaded [''' + str(total_emails) + ''']
+
+
+                [1] Start
+                [2] Scan
+                [3] Option
+                [4] About
+                
+    '''
+except:
+
+    banner1 ='''
+
+
+    ███████╗███╗   ███╗ █████╗ ██╗██╗         ███████╗███████╗███╗   ██╗██████╗ ███████╗██████╗ 
+    ██╔════╝████╗ ████║██╔══██╗██║██║         ██╔════╝██╔════╝████╗  ██║██╔══██╗██╔════╝██╔══██╗
+    █████╗  ██╔████╔██║███████║██║██║         ███████╗█████╗  ██╔██╗ ██║██║  ██║█████╗  ██████╔╝
+    ██╔══╝  ██║╚██╔╝██║██╔══██║██║██║         ╚════██║██╔══╝  ██║╚██╗██║██║  ██║██╔══╝  ██╔══██╗
+    ███████╗██║ ╚═╝ ██║██║  ██║██║███████╗    ███████║███████╗██║ ╚████║██████╔╝███████╗██║  ██║
+    ╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝╚══════╝    ╚══════╝╚══════╝╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝
+
+
+                    Login as: [''' + "No Account Detected" + ''']                                                                            
+                    Email Loaded [''' + "0" + ''']
+
+
+                [1] Start
+                [2] Scan
+                [3] Option
+                [4] About
+                
+    '''
 
 op2 = '''
 
@@ -40,7 +137,7 @@ abt = '''
 
         About
 
-        App version 1
+        App version 0.3
         Build and Created by:
         Edmark Jay Sumampen
 
@@ -50,10 +147,19 @@ abt = '''
         how to setup?
         
 
-        App Password url: https://myaccount.google.com/apppasswords
+        visit my app documentation at https://github.com/edmark21/emailsender
         
 
 '''
+
+def removeacc():
+    file_path = "credentials.txt"
+
+    try:
+        os.remove(file_path)
+        print(f"File '{file_path}' deleted successfully.")
+    except FileNotFoundError:
+        print(f"File '{file_path}' not found.")
 
 
 def load_credentials(filename="credentials.txt"):
@@ -72,60 +178,90 @@ def load_credentials(filename="credentials.txt"):
             username, password = line.strip().split(":")
             return username, password
     except (FileNotFoundError, IOError):
-        print("Error: Could not find or read credentials file.")
+        print(" Error: Could not find or read credentials file.")
         return None
 
 
-def send_email():
 
-    credentials = load_credentials()
-    if credentials:
-        username, password = credentials
-        #print("Username:", username)
-        #print("Password:", password)
+#####fixing here......
 
 
-        """Sends an email with a subject and message.
+def send_personalized_email(receiver, last_name, template_file="file.txt", attachment_paths=[]):
+  """Sends a personalized email with an optional attachment.
 
-        Raises:
-            smtplib.SMTPException: If an error occurs during email sending.
-        """
+  Args:
+    receiver (str): The recipient's email address.
+    last_name (str): The recipient's last name.
+    template_file (str, optional): The name of the template file. Defaults to "file.txt".
+    attachment_paths (list[str], optional): A list of paths to attachment files. Defaults to an empty list.
+  """
 
-        sender = username
-        receiver = "abarskie112000@gmail.com"
-        password = password  # Replace with your actual password (store securely)
+  credentials = load_credentials()
+  if not credentials:
+    return
 
-        # Create a message object with subject and body
-        message = MIMEText("test ni siya", _charset="utf-8")
-        message["Subject"] = "Iyot"  # Replace with your desired subject
+  sender, password = credentials
 
-        try:
-            with smtplib.SMTP("smtp.gmail.com", 587) as server:
-                server.starttls()
-                server.login(sender, password)
-                server.sendmail(sender, receiver, message.as_string())
-                print("Message sent successfully! ==> " ,receiver)
-        except smtplib.SMTPException as e:
-            print(f"Error sending email: {e}")
+  with open(template_file, "r") as f:
+    lines = f.readlines()
+    lines[1] = lines[1].replace("name", last_name)  # Replace "name" on the second line
+    subject = lines[0].strip()
+    message_body = "".join(lines[1:])
 
-    else:
-        print("No credentials found.")
-        input("\nReturning to Main Menu....")
-        main()
+  # Create MIMEMultipart message
+  message = MIMEMultipart()
+  message["Subject"] = subject
+  message["From"] = sender
+  message["To"] = receiver
 
+  # Attach message body
+  message.attach(MIMEText(message_body, _charset="utf-8"))
 
-    
+  # Attach files if provided
+  if attachment_paths:
+    for attachment_path in attachment_paths:
+      with open(attachment_path, 'rb') as attachment:
+        part = MIMEBase('application', 'octet-stream')
+        part.set_payload(attachment.read())
+        encoders.encode_base64(part)  # Remove charset argument
+        part.add_header('Content-Disposition', 'attachment', filename=os.path.basename(attachment_path))
+        message.attach(part)
 
+  # Send email with error handling
+  try:
+    with smtplib.SMTP("smtp.gmail.com", 587) as server:
+      server.starttls()
+      server.login(sender, password)
+      server.sendmail(sender, receiver, message.as_string())
+      print(f" Message sent successfully to: {receiver}")
+  except Exception as e:
+    print(f" Error sending email: {e}")
 
+def send_emails():
+    """Reads data from JSON, sends personalized emails for each entry."""
+    with open('extracted_data.json', 'r') as f:
+        data = json.load(f)
 
+    for entry in data:
+        if 'Email' not in entry:
+            raise ValueError(f" Missing email address for entry: {entry}")
 
+        receiver = entry['Email']
+        last_name = entry["Last_Name"]
+        template_file = "file.txt"  # Default template
 
+        # Optional logic for different templates based on last name
+        if last_name in ["Smith", "Jones"]:
+            template_file = "file2.txt"
 
+        # Send email with retrieved data
+        send_personalized_email(receiver, last_name, template_file, attachment_paths=[fina, fina2, fina3])
+#####to here......
 def get_credentials():
     """Prompts the user for a username and password, and returns them as a tuple."""
 
-    username = input("Enter your username: ")
-    password = input("Enter your password: ")
+    username = input(" Enter your username: ")
+    password = input(" Enter your password: ")
     return username, password
 
 def save_credentials(username, password, filename="credentials.txt"):
@@ -139,10 +275,50 @@ def save_credentials(username, password, filename="credentials.txt"):
 
     with open(filename, "w") as file:
         file.write(f"{username}:{password}\n")
-    print("Credentials saved successfully!")
+    print(" Credentials saved successfully!")
 
 
+def scan():
 
+    floc = input(" Enter File Location of Json: ")
+    gid = input(" Enter Google sheet ID: ")
+    
+    # Replace with the path to your service account key JSON file 
+    SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
+    creds = ServiceAccountCredentials.from_json_keyfile_name(floc, SCOPES)
+
+    # Authorize
+    client = gspread.authorize(creds)
+
+    # Replace with the ID of your Google Sheet 
+    sheet_id = gid  # Replace with the actual ID
+
+    # Open the sheet by ID
+    sheet = client.open_by_key(sheet_id).sheet1
+
+    # Get all data from the sheet
+    data = sheet.get_all_values()
+
+    # Assuming Last Name and Email are in columns with known positions (e.g., Last Name in column 2 and Email in column 3)
+    last_name_column = 2  # Adjust this based on your actual column position
+    email_column = 5  # Adjust this based on your actual column position
+
+    # Create an empty list to store extracted data
+    extracted_data = []
+
+    # Skip the header row (assuming the first row contains column names)
+    for row in data[1:]:
+        last_name = row[last_name_column - 1]
+        email = row[email_column - 1]
+        # Create a dictionary to store Last Name and Email for each entry
+        entry = {"Last_Name": last_name, "Email": email}
+        extracted_data.append(entry)
+
+    # Write the extracted data to a JSON file
+    with open('extracted_data.json', 'w') as outfile:
+        json.dump(extracted_data, outfile, indent=4)
+
+    print(" Scan Completed!, extracted_data.json extracted done! ")
 
 
 
@@ -155,59 +331,67 @@ def save_credentials(username, password, filename="credentials.txt"):
 
 
 def main():
-    os.system("cls")
+    wala()
     print(banner1)
     
 
-    opt_butang = input("Select Option [1-3]: ")
+    opt_butang = input(" Select Option [1-3]: ")
 
     if opt_butang == "1":
-        print("Starting......")
-        send_email()
+        print(" Starting......")
+        send_emails()
+        input("\n\n\n All Email Sent Successfully!, Press Enter to Go Menu....")
+        main()
+
+    elif opt_butang == "2":
+        print(" Scanning Data......")
+        scan()
+        input("\n\n\n Press Enter to Go Menu....")
+        main()
 
         
-    elif opt_butang == "2":
+    elif opt_butang == "3":
         print(op2)
-        opt = input("Select Option [1-3]: ")
+        opt = input(" Select Option [1-3]: ")
         if opt == "1":
             username, password = get_credentials()
             save_credentials(username, password)
-            input("\n\nPress Enter to Continue....")
+            input("\n\n Press Enter to Continue....")
             main()
             
         elif opt == "2":
             credentials = load_credentials()
             if credentials:
                 username, password = credentials
-                print("Username:", username)
-                print("Password:", password)
+                print(" Username:", username)
+                print(" Password:", password)
             else:
-                print("No credentials found.")
+                print(" No credentials found.")
 
-            input("\n\nPress Enter to Continue....")
+            input("\n\n Press Enter to Continue....")
             main()
             
 
 
             
         elif opt == "3":
-            print("comming soon")
-            input("\n\nPress Enter to Continue....")
+            removeacc()
+            input("\n\n Press Enter to Continue....")
             main()
             
             
         else:
-            input("error pls select only [1-3]: ")
+            input(" error pls select only [1-3]: ")
             main()
 
-    elif opt_butang == "3":
+    elif opt_butang == "4":
         print(abt)
-        input("\n\nPress Enter to Continue....")
+        input("\n\n Press Enter to Continue....")
         main()
         
 
     else:
-        print("error pls select only [1-3]")
+        print(" error pls select only [1-3]")
         main()
 
 
