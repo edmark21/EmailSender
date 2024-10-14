@@ -1,7 +1,7 @@
 import getpass, os, sys, re, json
 import smtplib
 
-import gspread
+import gspread, time
 
 from oauth2client.service_account import ServiceAccountCredentials
 from email.mime.text import MIMEText
@@ -23,9 +23,28 @@ wala()
 
 
 filename = 'credentials.txt'
-fina = input(" [1] Enter the filename of the file, ex: file.pdf or file.txt: ")
-fina2 = input(" [2] Enter the filename of the file, ex: file.pdf or file.txt: ")
-fina3 = input(" [3] Enter the filename of the signature file, ex: signature.png: ")
+hmf = input("How many files: ")
+
+a = []
+
+if hmf == "1":
+    fina = input(" [1] Enter the filename of the file, ex: file.pdf or file.txt: ")
+    a.append(fina)
+elif hmf == "2":
+    fina = input(" [1] Enter the filename of the file, ex: file.pdf or file.txt: ")
+    fina2 = input(" [2] Enter the filename of the file, ex: file.pdf or file.txt: ")
+    a.extend([fina, fina2])
+elif hmf == "3":
+    fina = input(" [1] Enter the filename of the file, ex: file.pdf or file.txt: ")
+    fina2 = input(" [2] Enter the filename of the file, ex: file.pdf or file.txt: ")
+    fina3 = input(" [3] Enter the filename of the signature file, ex: signature.png: ")
+    a.extend([fina, fina2, fina3])
+elif hmf == "4":
+    fina = input(" [1] Enter the filename of the file, ex: file.pdf or file.txt: ")
+    fina2 = input(" [2] Enter the filename of the file, ex: file.pdf or file.txt: ")
+    fina3 = input(" [3] Enter the filename of the signature file, ex: signature.png: ")
+    fina4 = input(" [4] Enter the filename of the signature file, ex: signature.png: ")
+    a.extend([fina, fina2, fina3, fina4])
 
 
 
@@ -137,7 +156,7 @@ abt = '''
 
         About
 
-        App version 0.3
+        App version 0.4
         Build and Created by:
         Edmark Jay Sumampen
 
@@ -251,11 +270,7 @@ def send_emails():
         template_file = "file.txt"  # Default template
 
         # Optional logic for different templates based on last name
-        if last_name in ["Smith", "Jones"]:
-            template_file = "file2.txt"
-
-        # Send email with retrieved data
-        send_personalized_email(receiver, last_name, template_file, attachment_paths=[fina, fina2, fina3])
+        send_personalized_email(receiver, last_name, template_file, attachment_paths=a)
 #####to here......
 def get_credentials():
     """Prompts the user for a username and password, and returns them as a tuple."""
@@ -338,10 +353,20 @@ def main():
     opt_butang = input(" Select Option [1-3]: ")
 
     if opt_butang == "1":
-        print(" Starting......")
-        send_emails()
-        input("\n\n\n All Email Sent Successfully!, Press Enter to Go Menu....")
-        main()
+        aus = input(" [!] Are you sure you wanted to proceed? [y/n]: ")
+        if aus == "y":
+          print(" Starting......")
+          send_emails()
+          input("\n\n\n All Email Sent Successfully!, Press Enter to Go Menu....")
+          main()
+        elif aus == "n":
+          print(" [+] Thanks God u change ur mind...")
+          
+
+        else:
+          print(" [!] Incorrect Input!, pls try again.....")
+          time.sleep(3)
+          main()
 
     elif opt_butang == "2":
         print(" Scanning Data......")
