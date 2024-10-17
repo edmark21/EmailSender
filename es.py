@@ -1,7 +1,8 @@
 import getpass, os, sys, re, json
 import smtplib
 
-import gspread, time
+import gspread, time, datetime
+from datetime import *
 
 from oauth2client.service_account import ServiceAccountCredentials
 from email.mime.text import MIMEText
@@ -19,35 +20,20 @@ def wala():
     
 wala()
 
-
-
+email_template_file = "EmailTemplate/template1.txt"
 
 filename = 'credentials.txt'
-hmf = input("How many files: ")
+
 
 a = []
 
-if hmf == "1":
-    fina = input(" [1] Enter the filename of the file, ex: file.pdf or file.txt: ")
-    a.append(fina)
-elif hmf == "2":
-    fina = input(" [1] Enter the filename of the file, ex: file.pdf or file.txt: ")
-    fina2 = input(" [2] Enter the filename of the file, ex: file.pdf or file.txt: ")
-    a.extend([fina, fina2])
-elif hmf == "3":
-    fina = input(" [1] Enter the filename of the file, ex: file.pdf or file.txt: ")
-    fina2 = input(" [2] Enter the filename of the file, ex: file.pdf or file.txt: ")
-    fina3 = input(" [3] Enter the filename of the signature file, ex: signature.png: ")
-    a.extend([fina, fina2, fina3])
-elif hmf == "4":
-    fina = input(" [1] Enter the filename of the file, ex: file.pdf or file.txt: ")
-    fina2 = input(" [2] Enter the filename of the file, ex: file.pdf or file.txt: ")
-    fina3 = input(" [3] Enter the filename of the signature file, ex: signature.png: ")
-    fina4 = input(" [4] Enter the filename of the signature file, ex: signature.png: ")
-    a.extend([fina, fina2, fina3, fina4])
 
+directory_path = "Files"
+filenames = []
 
-
+for root, dirs, files in os.walk(directory_path):
+    for file in files:
+        a.append(file)
 
 
 
@@ -156,7 +142,7 @@ abt = '''
 
         About
 
-        App version 0.4
+        App version 0.5
         Build and Created by:
         Edmark Jay Sumampen
 
@@ -205,56 +191,66 @@ def load_credentials(filename="credentials.txt"):
 #####fixing here......
 
 
-def send_personalized_email(receiver, last_name, template_file="file.txt", attachment_paths=[]):
-  """Sends a personalized email with an optional attachment.
+def send_personalized_email(receiver, last_name, template_file=email_template_file, attachment_paths=[]):
+    """Sends a personalized email with an optional attachment.
 
-  Args:
-    receiver (str): The recipient's email address.
-    last_name (str): The recipient's last name.
-    template_file (str, optional): The name of the template file. Defaults to "file.txt".
-    attachment_paths (list[str], optional): A list of paths to attachment files. Defaults to an empty list.
-  """
+    Args:
+        receiver (str): The recipient's email address.
+        last_name (str): The recipient's last name.
+        template_file (str, optional): The name of the template file. Defaults to "file.txt".
+        attachment_paths (list[str], optional): A list of paths to attachment files. Defaults to an empty list.
+    """
 
-  credentials = load_credentials()
-  if not credentials:
-    return
+    credentials = load_credentials()
+    if not credentials:
+        return
 
-  sender, password = credentials
+    sender, password = credentials
 
-  with open(template_file, "r") as f:
-    lines = f.readlines()
-    lines[1] = lines[1].replace("name", last_name)  # Replace "name" on the second line
-    subject = lines[0].strip()
-    message_body = "".join(lines[1:])
+    with open(template_file, "r") as f:
+        lines = f.readlines()
+        lines[1] = lines[1].replace("name", last_name)  # Replace "name" on the second line
+        subject = lines[0].strip()
+        message_body = "".join(lines[1:])
 
-  # Create MIMEMultipart message
-  message = MIMEMultipart()
-  message["Subject"] = subject
-  message["From"] = sender
-  message["To"] = receiver
+    # Create MIMEMultipart message
+    message = MIMEMultipart()
+    message["Subject"] = subject
+    message["From"] = sender
+    message["To"] = receiver
 
-  # Attach message body
-  message.attach(MIMEText(message_body, _charset="utf-8"))
+    # Attach message body
+    message.attach(MIMEText(message_body, _charset="utf-8"))
 
-  # Attach files if provided
-  if attachment_paths:
-    for attachment_path in attachment_paths:
-      with open(attachment_path, 'rb') as attachment:
-        part = MIMEBase('application', 'octet-stream')
-        part.set_payload(attachment.read())
-        encoders.encode_base64(part)  # Remove charset argument
-        part.add_header('Content-Disposition', 'attachment', filename=os.path.basename(attachment_path))
-        message.attach(part)
+    # Attach files if provided
+    if attachment_paths:
+        for attachment_path in attachment_paths:
+            with open(attachment_path, 'rb') as attachment:
+                part = MIMEBase('application', 'octet-stream')
+                part.set_payload(attachment.read())
 
-  # Send email with error handling
-  try:
-    with smtplib.SMTP("smtp.gmail.com", 587) as server:
-      server.starttls()
-      server.login(sender, password)
-      server.sendmail(sender, receiver, message.as_string())
-      print(f" Message sent successfully to: {receiver}")
-  except Exception as e:
-    print(f" Error sending email: {e}")
+                encoders.encode_base64(part)
+  # Remove charset argument
+                part.add_header('Content-Disposition', 'attachment', filename=os.path.basename(attachment_path))
+                message.attach(part)
+
+    # Send email with error handling and log successful sends
+    try:
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()
+            server.login(sender, password)
+            server.sendmail(sender, receiver, message.as_string())
+
+            server.sendmail(sender, receiver, message.as_string())
+
+            print(f" Message sent successfully to: {receiver}")
+
+            # Log the successful send to logs.txt
+            with open("logs.txt", "a") as log_file:
+                
+                log_file.write(f"{receiver} > done > {datetime.now().strftime('%Y-%m-%d %H:%M:%S %p')}\n")
+    except Exception as e:
+        print(f" Error sending email: {e}")
 
 def send_emails():
     """Reads data from JSON, sends personalized emails for each entry."""
@@ -267,7 +263,7 @@ def send_emails():
 
         receiver = entry['Email']
         last_name = entry["Last_Name"]
-        template_file = "file.txt"  # Default template
+        template_file = email_template_file  # Default template
 
         # Optional logic for different templates based on last name
         send_personalized_email(receiver, last_name, template_file, attachment_paths=a)
