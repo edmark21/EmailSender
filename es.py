@@ -58,8 +58,8 @@ def count_emails(file_path):
   return email_count
 
 # Replace 'extracted_data.json' with the actual path to your JSON file
-file_path = 'extracted_data.json'
-total_emails = count_emails(file_path) #total email
+
+
 
 
 
@@ -77,10 +77,9 @@ except FileNotFoundError:
     print(f"[Please Login first in Option menu]")
 
 try:
-    
-
-
-    banner1 ='''
+  file_path = 'extracted_data.json'
+  total_emails = count_emails(file_path) #total email
+  banner1 ='''
 
 
     ███████╗███╗   ███╗ █████╗ ██╗██╗         ███████╗███████╗███╗   ██╗██████╗ ███████╗██████╗ 
@@ -90,7 +89,8 @@ try:
     ███████╗██║ ╚═╝ ██║██║  ██║██║███████╗    ███████║███████╗██║ ╚████║██████╔╝███████╗██║  ██║
     ╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝╚══════╝    ╚══════╝╚══════╝╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝
 
-
+                                            [V 0.6]
+                              
                     Login as: [''' + email + ''']                                                                            
                     Email Loaded [''' + str(total_emails) + ''']
 
@@ -102,8 +102,10 @@ try:
                 
     '''
 except:
+  
 
-    banner1 ='''
+
+  banner1 ='''
 
 
     ███████╗███╗   ███╗ █████╗ ██╗██╗         ███████╗███████╗███╗   ██╗██████╗ ███████╗██████╗ 
@@ -113,6 +115,7 @@ except:
     ███████╗██║ ╚═╝ ██║██║  ██║██║███████╗    ███████║███████╗██║ ╚████║██████╔╝███████╗██║  ██║
     ╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝╚══════╝    ╚══════╝╚══════╝╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝
 
+                                            [V 0.6]
 
                     Login as: [''' + "No Account Detected" + ''']                                                                            
                     Email Loaded [''' + "0" + ''']
