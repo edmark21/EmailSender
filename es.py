@@ -145,7 +145,7 @@ abt = '''
 
         About
 
-        App version 0.5
+        App version 0.6
         Build and Created by:
         Edmark Jay Sumampen
 
