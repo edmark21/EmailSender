@@ -25,15 +25,7 @@ email_template_file = "EmailTemplate/template1.txt"
 filename = 'credentials.txt'
 
 
-a = []
 
-
-directory_path = "Files"
-filenames = []
-
-for root, dirs, files in os.walk(directory_path):
-    for file in files:
-        a.append(file)
 
 
 
@@ -115,7 +107,7 @@ except:
     ███████╗██║ ╚═╝ ██║██║  ██║██║███████╗    ███████║███████╗██║ ╚████║██████╔╝███████╗██║  ██║
     ╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝╚══════╝    ╚══════╝╚══════╝╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝
 
-                                            [V 0.6]
+                                            [V 0.7]
 
                     Login as: [''' + "No Account Detected" + ''']                                                                            
                     Email Loaded [''' + "0" + ''']
@@ -145,7 +137,7 @@ abt = '''
 
         About
 
-        App version 0.6
+        App version 0.7
         Build and Created by:
         Edmark Jay Sumampen
 
@@ -225,35 +217,34 @@ def send_personalized_email(receiver, last_name, template_file=email_template_fi
     # Attach message body
     message.attach(MIMEText(message_body, _charset="utf-8"))
 
-    # Attach files if provided
+    # Attach files if provided (using context manager for efficiency)
     if attachment_paths:
         for attachment_path in attachment_paths:
             with open(attachment_path, 'rb') as attachment:
                 part = MIMEBase('application', 'octet-stream')
-                part.set_payload(attachment.read())
+                part.set_payload(attachment.read()) 
 
                 encoders.encode_base64(part)
-  # Remove charset argument
-                part.add_header('Content-Disposition', 'attachment', filename=os.path.basename(attachment_path))
+                part.add_header('Content-Disposition', 'attachment', filename=os.path.basename(attachment_path)) 
+
                 message.attach(part)
 
-    # Send email with error handling and log successful sends
+    # Send email with error handling, log successful sends, and use a single sendmail call
     try:
         with smtplib.SMTP("smtp.gmail.com", 587) as server:
             server.starttls()
             server.login(sender, password)
-            server.sendmail(sender, receiver, message.as_string())
+            server.sendmail(sender, receiver, message.as_string()) 
 
-            server.sendmail(sender, receiver, message.as_string())
 
-            print(f" Message sent successfully to: {receiver}")
+        print(f" Message sent successfully to: {receiver}")
 
-            # Log the successful send to logs.txt
-            with open("logs.txt", "a") as log_file:
-                
-                log_file.write(f"{receiver} > done > {datetime.now().strftime('%Y-%m-%d %H:%M:%S %p')}\n")
+        # Log the successful send to logs.txt
+        with open("logs.txt", "a") as log_file:
+            log_file.write(f"{receiver} > done > {datetime.now().strftime('%Y-%m-%d %H:%M:%S %p')}\n")
     except Exception as e:
         print(f" Error sending email: {e}")
+
 
 def send_emails():
     """Reads data from JSON, sends personalized emails for each entry."""
@@ -268,8 +259,19 @@ def send_emails():
         last_name = entry["Last_Name"]
         template_file = email_template_file  # Default template
 
-        # Optional logic for different templates based on last name
-        send_personalized_email(receiver, last_name, template_file, attachment_paths=a)
+        # Define directory path for attachments
+        directory_path = "Files"
+
+        # Empty list to store attachment paths
+        attachment_paths = []
+
+        # Loop through files in the directory (avoid unnecessary nested loop)
+        for file in os.listdir(directory_path):
+            attachment_paths.append(os.path.join(directory_path, file))
+
+        # Send email with attachment_paths
+        send_personalized_email(receiver, last_name, template_file, attachment_paths=attachment_paths)
+
 #####to here......
 def get_credentials():
     """Prompts the user for a username and password, and returns them as a tuple."""
