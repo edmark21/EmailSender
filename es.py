@@ -20,6 +20,8 @@ def wala():
     
 wala()
 
+sent_emails = 0
+
 email_template_file = "EmailTemplate/template1.txt"
 
 filename = 'credentials.txt'
@@ -81,7 +83,7 @@ try:
     ███████╗██║ ╚═╝ ██║██║  ██║██║███████╗    ███████║███████╗██║ ╚████║██████╔╝███████╗██║  ██║
     ╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝╚══════╝    ╚══════╝╚══════╝╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝
 
-                                            [V 0.6]
+                                            [V 0.8]
                               
                     Login as: [''' + email + ''']                                                                            
                     Email Loaded [''' + str(total_emails) + ''']
@@ -107,7 +109,7 @@ except:
     ███████╗██║ ╚═╝ ██║██║  ██║██║███████╗    ███████║███████╗██║ ╚████║██████╔╝███████╗██║  ██║
     ╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝╚══════╝    ╚══════╝╚══════╝╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝
 
-                                            [V 0.7]
+                                            [V 0.8]
 
                     Login as: [''' + "No Account Detected" + ''']                                                                            
                     Email Loaded [''' + "0" + ''']
@@ -137,7 +139,7 @@ abt = '''
 
         About
 
-        App version 0.7
+        App version 0.8
         Build and Created by:
         Edmark Jay Sumampen
 
@@ -195,7 +197,8 @@ def send_personalized_email(receiver, last_name, template_file=email_template_fi
         template_file (str, optional): The name of the template file. Defaults to "file.txt".
         attachment_paths (list[str], optional): A list of paths to attachment files. Defaults to an empty list.
     """
-
+    global sent_emails
+    sent_emails += 1
     credentials = load_credentials()
     if not credentials:
         return
@@ -237,7 +240,8 @@ def send_personalized_email(receiver, last_name, template_file=email_template_fi
             server.sendmail(sender, receiver, message.as_string()) 
 
 
-        print(f" Message sent successfully to: {receiver}")
+        #print(f" Message sent successfully to: {receiver}")
+        print(f" {sent_emails}/{total_emails} Message sent successfully to: {receiver}")
 
         # Log the successful send to logs.txt
         with open("logs.txt", "a") as log_file:
@@ -294,53 +298,73 @@ def save_credentials(username, password, filename="credentials.txt"):
     print(" Credentials saved successfully!")
 
 
+import os, sys
+from oauth2client.service_account import ServiceAccountCredentials
+import json, gspread
+
 def scan():
+  # Automatically detect the JSON file in the gsheetapi folder
+  json_file = os.path.join("gsheetapi", "credentials.json")  # Adjust the file name if needed
 
-    floc = input(" Enter File Location of Json: ")
-    gid = input(" Enter Google sheet ID: ")
+  # Check if the file exists
+  if not os.path.exists(json_file):
+    raise FileNotFoundError(f"JSON file not found at: {json_file}")
+
+  gid = input(" Enter Google sheet ID: ")
+  sheet_name = input(" Enter the name of the sheet you want to scan: ")
+
+
+  col1 = input(" [1] Enter column #: ")
+  col2 = input(" [2] Enter column #: ")
+
+  # Replace with the path to your service account key JSON file
+  SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
+  creds = ServiceAccountCredentials.from_json_keyfile_name(json_file, SCOPES)
+
+  # Authorize
+  client = gspread.authorize(creds)
+
+  # Replace with the ID of your Google Sheet
+  sheet_id = gid  # Replace with the actual ID
+
+  # Open the sheet by ID and name
+  sheet = client.open_by_key(sheet_id).worksheet(sheet_name)
+
+  # Get all data from the sheet
+  data = sheet.get_all_values()
+
+  # Assuming Last Name and Email are in columns with known positions (e.g., Last Name in column 2 and Email in column 3)
+  last_name_column = int(col1)  # Adjust this based on your actual column position
+  email_column = int(col2)  # Adjust this based on your actual column position
+
+  # Create an empty list to store extracted data
+  extracted_data = []
+
+  # Skip the header row (assuming the first row contains column names)
+  for row in data[1:]:
+    last_namee = row[last_name_column - 1].split(",")
+    lnn = last_namee[0]
+    ln = lnn.capitalize()
+    email = row[email_column - 1]
+
+
+
+    # Create a dictionary to store Last Name and Email for each entry
+    entry = {"Last_Name": ln, "Email": email}
+    extracted_data.append(entry)
+
+  # Write the extracted data to a JSON file
+  with open('extracted_data.json', 'w') as outfile:
+    json.dump(extracted_data, outfile, indent=4)
+
+  print(" Scan Completed!, extracted_data.json extracted done! ")
+
+
+
+
+
     
-    # Replace with the path to your service account key JSON file 
-    SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
-    creds = ServiceAccountCredentials.from_json_keyfile_name(floc, SCOPES)
 
-    # Authorize
-    client = gspread.authorize(creds)
-
-    # Replace with the ID of your Google Sheet 
-    sheet_id = gid  # Replace with the actual ID
-
-    # Open the sheet by ID
-    sheet = client.open_by_key(sheet_id).sheet1
-
-    # Get all data from the sheet
-    data = sheet.get_all_values()
-
-    # Assuming Last Name and Email are in columns with known positions (e.g., Last Name in column 2 and Email in column 3)
-    last_name_column = 2  # Adjust this based on your actual column position
-    email_column = 5  # Adjust this based on your actual column position
-
-    # Create an empty list to store extracted data
-    extracted_data = []
-
-    # Skip the header row (assuming the first row contains column names)
-    for row in data[1:]:
-        last_name = row[last_name_column - 1]
-        email = row[email_column - 1]
-        # Create a dictionary to store Last Name and Email for each entry
-        entry = {"Last_Name": last_name, "Email": email}
-        extracted_data.append(entry)
-
-    # Write the extracted data to a JSON file
-    with open('extracted_data.json', 'w') as outfile:
-        json.dump(extracted_data, outfile, indent=4)
-
-    print(" Scan Completed!, extracted_data.json extracted done! ")
-
-
-
-
-
-    
 
 
 
