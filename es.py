@@ -1,24 +1,23 @@
 import getpass, os, sys, re, json
 import smtplib
-
 import gspread, time, datetime
 from datetime import *
-
 from oauth2client.service_account import ServiceAccountCredentials
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
+import asyncio
+from colorama import Fore, Back, Style
 
+red = Fore.RED
+green = Fore.GREEN
+yellow = Fore.YELLOW
+blue = Fore.BLUE
+magenta = Fore.MAGENTA
+cyan = Fore.CYAN
+reset = Fore.RESET
 
-def wala():
-  try:
-    os.system("cls")
-
-  except:
-    os.system("clear")
-    
-wala()
 
 sent_emails = 0
 
@@ -27,30 +26,35 @@ email_template_file = "EmailTemplate/template1.txt"
 filename = 'credentials.txt'
 
 
+def wala():
+  """Clears the terminal screen, cross-platform."""
 
-
+  # Check for Windows
+  if os.name == 'nt':
+    os.system('cls')
+  else:
+    os.system('clear')
 
 
 def count_emails(file_path):
-  """Counts the total number of emails in a JSON file.
+    """Counts the total number of emails in a JSON file.
 
-  Args:
-    file_path: The path to the JSON file.
+    Args:
+        file_path: The path to the JSON file.
 
-  Returns:
-    The total number of emails.
-  """
+    Returns:
+        The total number of emails.
+    """
 
-  with open(file_path, 'r') as f:
-    data = json.load(f)
+    with open(file_path, 'r') as f:
+        data = json.load(f)
 
-  email_count = 0
-  for entry in data:
-    if 'Email' in entry:
-      email_count += 1
+    email_count = 0
+    for entry in data:
+        if 'Email' in entry:
+            email_count += 1
 
-  return email_count
-
+    return email_count
 # Replace 'extracted_data.json' with the actual path to your JSON file
 
 
@@ -83,7 +87,7 @@ try:
     ███████╗██║ ╚═╝ ██║██║  ██║██║███████╗    ███████║███████╗██║ ╚████║██████╔╝███████╗██║  ██║
     ╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝╚══════╝    ╚══════╝╚══════╝╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝
 
-                                            [V 0.8]
+                                            [V 0.9]
                               
                     Login as: [''' + email + ''']                                                                            
                     Email Loaded [''' + str(total_emails) + ''']
@@ -93,6 +97,7 @@ try:
                 [2] Scan
                 [3] Option
                 [4] About
+                [5] Exit
                 
     '''
 except:
@@ -109,7 +114,7 @@ except:
     ███████╗██║ ╚═╝ ██║██║  ██║██║███████╗    ███████║███████╗██║ ╚████║██████╔╝███████╗██║  ██║
     ╚══════╝╚═╝     ╚═╝╚═╝  ╚═╝╚═╝╚══════╝    ╚══════╝╚══════╝╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝
 
-                                            [V 0.8]
+                                            [V 0.9]
 
                     Login as: [''' + "No Account Detected" + ''']                                                                            
                     Email Loaded [''' + "0" + ''']
@@ -119,6 +124,7 @@ except:
                 [2] Scan
                 [3] Option
                 [4] About
+                [5] Exit
                 
     '''
 
@@ -380,7 +386,7 @@ def main():
     if opt_butang == "1":
         aus = input(" [!] Are you sure you wanted to proceed? [y/n]: ")
         if aus == "y":
-          print(" Starting......")
+          print(" Starting......\n")
           send_emails()
           input("\n\n\n All Email Sent Successfully!, Press Enter to Go Menu....")
           main()
@@ -438,6 +444,10 @@ def main():
         print(abt)
         input("\n\n Press Enter to Continue....")
         main()
+
+    elif opt_butang == "5":
+        print(" [+] Shutting Down...")
+        sys.exit()
         
 
     else:
