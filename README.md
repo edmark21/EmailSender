@@ -1,6 +1,6 @@
 # EmailSender
 Send email in a autonomous way
-![Screenshot](1.PNG)
+![Screenshot](img.png)
 # Email Sender Bot👋 
 
 ## Installation 
