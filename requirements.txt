@@ -2,3 +2,4 @@ gspread
 oauth2client
 datetime
 asyncio
+colorama
